@@ -6,7 +6,7 @@
 \usage{
 sf_multipolygon(obj = NULL, x = NULL, y = NULL, z = NULL,
   m = NULL, multipolygon_id = NULL, polygon_id = NULL,
-  linestring_id = NULL, close = TRUE)
+  linestring_id = NULL, close = TRUE, keep = FALSE)
 }
 \arguments{
 \item{obj}{sorted matrix or data.frame}
@@ -27,6 +27,10 @@ sf_multipolygon(obj = NULL, x = NULL, y = NULL, z = NULL,
 
 \item{close}{logical indicating whether polygons should be closed. If \code{TRUE},
 all polygons will be checked and force closed if possible}
+
+\item{keep}{logical indicating if the non-geometry and non-id columns should be kept.
+if TRUE you must supply the geometry and id columns, and only the first row of
+each geometry is kept. See Keeping Properties.}
 }
 \value{
 \code{sf} object of MULTIPOLYGON geometries
@@ -40,6 +44,16 @@ sfheaders functions do not perform any validity checks on the geometries.
 Nor do they set Coordinate Reference Systems, EPSG, PROJ4 or precision attributes.
 
 The data.frame and matrices you send into the sfheader functions must be ordered.
+}
+
+\section{Keeping Properties}{
+
+
+Setting \code{keep = TRUE} will retain the first row of any columns not specified as a
+coordinate (x, y, z, m) or an id (e.g., linestring_id, polygon_id) of the input \code{obj}.
+
+The \code{sf_*} functions assume the input \code{obj} is a long data.frame / matrix,
+where any properties are repeated down the table for the same geometry.
 }
 
 \examples{
@@ -91,7 +105,7 @@ df <- data.frame(
 sf_multipolygon( df, multipolygon_id = "id1", polygon_id = "id2" )
 sf_multipolygon( df, polygon_id = "id1", linestring_id = "id2" )
 sf_multipolygon( df, x = "x", y = "y", polygon_id = "id1")
-sf_multipolygon( df, x = "x", y = "y", polygon_id = "id1", linestring_id =)
+sf_multipolygon( df, x = "x", y = "y", polygon_id = "id1", linestring_id = "id2")
 sf_multipolygon( df, x = "x", y = "y", linestring_id = "id1")
 sf_multipolygon( df, x = "x", y = "y", linestring_id = "id2")
 

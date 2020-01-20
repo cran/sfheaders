@@ -248,7 +248,7 @@ namespace sfc {
     return Rcpp::List::create();
   }
 
-  // no subsetting to do (except for columsn)
+  // no subsetting to do (except for columns)
   inline SEXP sfc_multipolygon(
       Rcpp::IntegerMatrix& im,
       Rcpp::IntegerVector& geometry_cols,
@@ -481,18 +481,13 @@ inline SEXP sfc_multipolygon(
 }
 // #nocov end
 
-
-// is the idea here to first get the vector of polygon_ids
-// but keep the line_ids as a column reference
-// then subset the df in teh outerloop by polygon_id
-// then go in and get the sfg_multipolygon based on the line_ids?
 inline SEXP sfc_multipolygon(
-    Rcpp::DataFrame& df,
-    Rcpp::IntegerVector& geometry_cols,
-    SEXP& multipolygon_ids,
-    int& polygon_id,
-    int& linestring_id,
-    bool close = true
+  Rcpp::DataFrame& df,
+  Rcpp::IntegerVector& geometry_cols,
+  int& polygon_id,
+  int& linestring_id,
+  Rcpp::IntegerMatrix& multipolygon_positions,
+  bool close = true
 ) {
   Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
   Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
@@ -503,10 +498,59 @@ inline SEXP sfc_multipolygon(
   R_xlen_t n_col = df.ncol();
   sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, df, geometry_cols );
 
-  SEXP unique_multipolygon_ids = sfheaders::utils::get_sexp_unique( multipolygon_ids );
-  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids, unique_multipolygon_ids );
 
-  R_xlen_t n_multipolygons = sfheaders::utils::get_sexp_length( unique_multipolygon_ids );
+  R_xlen_t n_multipolygons = multipolygon_positions.nrow();
+
+  R_xlen_t i;
+  Rcpp::List sfc( n_multipolygons );
+
+  int start;
+  int end;
+  Rcpp::StringVector df_names = df.names();
+
+  for( i = 0; i < n_multipolygons; i++ ) {
+    start = multipolygon_positions( i, 0 );
+    end = multipolygon_positions( i, 1 );
+    Rcpp::DataFrame df_subset = sfheaders::utils::subset_dataframe( df, df_names, start, end );
+    sfc( i ) = sfheaders::sfg::sfg_multipolygon( df_subset, geometry_cols, polygon_id, linestring_id, close );
+  }
+
+  sfheaders::sfc::make_sfc( sfc, sfheaders::sfc::SFC_MULTIPOLYGON, bbox, z_range, m_range );
+  return sfc;
+}
+
+
+inline SEXP sfc_multipolygon(
+    Rcpp::DataFrame& df,
+    Rcpp::IntegerVector& geometry_cols,
+    SEXP& multipolygon_ids,
+    int& polygon_id,
+    int& linestring_id,
+    bool close = true
+) {
+  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids );
+  return sfc_multipolygon( df, geometry_cols, polygon_id, linestring_id, multipolygon_positions, close );
+}
+
+inline SEXP sfc_multipolygon(
+  Rcpp::DataFrame& df,
+  Rcpp::StringVector& geometry_cols,
+  Rcpp::String& polygon_id,
+  Rcpp::String& linestring_id,
+  Rcpp::IntegerMatrix& multipolygon_positions,
+  bool close = true
+) {
+  Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
+  Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
+  Rcpp::NumericVector m_range = sfheaders::zm::start_m_range();
+
+  sfheaders::bbox::calculate_bbox( bbox, df, geometry_cols );
+
+  R_xlen_t n_col = df.ncol();
+  sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, df, geometry_cols );
+
+
+  R_xlen_t n_multipolygons = multipolygon_positions.nrow();
   R_xlen_t i;
   Rcpp::List sfc( n_multipolygons );
 
@@ -533,44 +577,17 @@ inline SEXP sfc_multipolygon(
     Rcpp::String& linestring_id,
     bool close = true
 ) {
-  Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
-  Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
-  Rcpp::NumericVector m_range = sfheaders::zm::start_m_range();
-
-  sfheaders::bbox::calculate_bbox( bbox, df, geometry_cols );
-
-  R_xlen_t n_col = df.ncol();
-  sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, df, geometry_cols );
-
-  SEXP unique_multipolygon_ids = sfheaders::utils::get_sexp_unique( multipolygon_ids );
-  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids, unique_multipolygon_ids );
-
-  R_xlen_t n_multipolygons = sfheaders::utils::get_sexp_length( unique_multipolygon_ids );
-  R_xlen_t i;
-  Rcpp::List sfc( n_multipolygons );
-
-  int start;
-  int end;
-  Rcpp::StringVector df_names = df.names();
-
-  for( i = 0; i < n_multipolygons; i++ ) {
-    start = multipolygon_positions( i, 0 );
-    end = multipolygon_positions( i, 1 );
-    Rcpp::DataFrame df_subset = sfheaders::utils::subset_dataframe( df, df_names, start, end );
-    sfc( i ) = sfheaders::sfg::sfg_multipolygon( df_subset, geometry_cols, polygon_id, linestring_id, close );
-  }
-
-  sfheaders::sfc::make_sfc( sfc, sfheaders::sfc::SFC_MULTIPOLYGON, bbox, z_range, m_range );
-  return sfc;
+  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids );
+  return sfc_multipolygon( df, geometry_cols, polygon_id, linestring_id, multipolygon_positions, close );
 }
 
 inline SEXP sfc_multipolygon(
-    Rcpp::IntegerMatrix& im,
-    Rcpp::IntegerVector& geometry_cols,
-    Rcpp::IntegerVector& multipolygon_ids,
-    int& polygon_id,
-    int& linestring_id,
-    bool close = true
+  Rcpp::IntegerMatrix& im,
+  Rcpp::IntegerVector& geometry_cols,
+  int& polygon_id,
+  int& linestring_id,
+  Rcpp::IntegerMatrix& multipolygon_positions,
+  bool close = true
 ) {
   Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
   Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
@@ -581,10 +598,8 @@ inline SEXP sfc_multipolygon(
   R_xlen_t n_col = im.ncol();
   sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, im, geometry_cols );
 
-  Rcpp::IntegerVector unique_multipolygon_ids = Rcpp::sort_unique( multipolygon_ids );
-  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids, unique_multipolygon_ids );
 
-  R_xlen_t n_multipolygons = unique_multipolygon_ids.length();
+  R_xlen_t n_multipolygons = multipolygon_positions.nrow();
   R_xlen_t i;
   Rcpp::List sfc( n_multipolygons );
 
@@ -603,12 +618,24 @@ inline SEXP sfc_multipolygon(
 }
 
 inline SEXP sfc_multipolygon(
-    Rcpp::NumericMatrix& nm,
+    Rcpp::IntegerMatrix& im,
     Rcpp::IntegerVector& geometry_cols,
-    Rcpp::NumericVector& multipolygon_ids,
+    Rcpp::IntegerVector& multipolygon_ids,
     int& polygon_id,
     int& linestring_id,
     bool close = true
+) {
+  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids );
+  return sfc_multipolygon( im, geometry_cols, polygon_id, linestring_id, multipolygon_positions, close );
+}
+
+inline SEXP sfc_multipolygon(
+  Rcpp::NumericMatrix& nm,
+  Rcpp::IntegerVector& geometry_cols,
+  int& polygon_id,
+  int& linestring_id,
+  Rcpp::IntegerMatrix& multipolygon_positions,
+  bool close = true
 ) {
   Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
   Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
@@ -619,10 +646,8 @@ inline SEXP sfc_multipolygon(
   R_xlen_t n_col = nm.ncol();
   sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, nm, geometry_cols );
 
-  Rcpp::NumericVector unique_multipolygon_ids = Rcpp::sort_unique( multipolygon_ids );
-  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids, unique_multipolygon_ids );
 
-  R_xlen_t n_multipolygons = unique_multipolygon_ids.length();
+  R_xlen_t n_multipolygons = multipolygon_positions.nrow();
   R_xlen_t i;
   Rcpp::List sfc( n_multipolygons );
 
@@ -638,6 +663,18 @@ inline SEXP sfc_multipolygon(
 
   sfheaders::sfc::make_sfc( sfc, sfheaders::sfc::SFC_MULTIPOLYGON, bbox, z_range, m_range );
   return sfc;
+}
+
+inline SEXP sfc_multipolygon(
+    Rcpp::NumericMatrix& nm,
+    Rcpp::IntegerVector& geometry_cols,
+    Rcpp::NumericVector& multipolygon_ids,
+    int& polygon_id,
+    int& linestring_id,
+    bool close = true
+) {
+  Rcpp::IntegerMatrix multipolygon_positions = sfheaders::utils::id_positions( multipolygon_ids );
+  return sfc_multipolygon( nm, geometry_cols, polygon_id, linestring_id, multipolygon_positions, close );
 }
 
 inline SEXP sfc_multipolygon(
@@ -1013,6 +1050,7 @@ inline SEXP sfc_multipolygon(
         Rcpp::String s_multipolygon_id_col = sv_multipolygon_id_col[0];
         Rcpp::String s_polygon_id_col = sv_polygon_id_col[0];
         Rcpp::String s_linestring_id_col = sv_linestring_id_col[0];
+
         return sfc_multipolygon( x, sv_geometry_cols, s_multipolygon_id_col, s_polygon_id_col, s_linestring_id_col, close );
       }
       default: {

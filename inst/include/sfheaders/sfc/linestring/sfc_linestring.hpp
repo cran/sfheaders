@@ -442,11 +442,10 @@ namespace sfc {
   }
 
 
-
   inline SEXP sfc_linestring(
-      Rcpp::IntegerMatrix& im,
-      Rcpp::IntegerVector& geometry_cols,
-      Rcpp::IntegerVector& line_ids
+    Rcpp::IntegerMatrix& im,
+    Rcpp::IntegerVector& geometry_cols,
+    Rcpp::IntegerMatrix& line_positions
   ) {
     Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
     Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
@@ -457,10 +456,7 @@ namespace sfc {
     R_xlen_t n_col = im.ncol();
     sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, im, geometry_cols );
 
-    Rcpp::IntegerVector unique_ids = Rcpp::sort_unique( line_ids );
-    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids, unique_ids );
-
-    R_xlen_t n_lines = unique_ids.length();
+    R_xlen_t n_lines = line_positions.nrow();
 
     Rcpp::List sfc( n_lines );
 
@@ -485,11 +481,19 @@ namespace sfc {
     return sfc;
   }
 
+  inline SEXP sfc_linestring(
+      Rcpp::IntegerMatrix& im,
+      Rcpp::IntegerVector& geometry_cols,
+      Rcpp::IntegerVector& line_ids
+  ) {
+    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids );
+    return sfc_linestring( im, geometry_cols, line_positions );
+  }
 
   inline SEXP sfc_linestring(
     Rcpp::NumericMatrix& nm,
     Rcpp::IntegerVector& geometry_cols,
-    Rcpp::NumericVector& line_ids
+    Rcpp::IntegerMatrix& line_positions
   ) {
     Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
     Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
@@ -500,11 +504,7 @@ namespace sfc {
     R_xlen_t n_col = nm.ncol();
     sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, nm, geometry_cols );
 
-    Rcpp::NumericVector unique_ids = Rcpp::sort_unique( line_ids );
-
-    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids, unique_ids );
-
-    R_xlen_t n_lines = unique_ids.length();
+    R_xlen_t n_lines = line_positions.nrow();
 
     Rcpp::List sfc( n_lines );
 
@@ -530,10 +530,22 @@ namespace sfc {
   }
 
   inline SEXP sfc_linestring(
-      Rcpp::DataFrame& df,
-      Rcpp::StringVector& geometry_cols,
-      SEXP& line_ids
+    Rcpp::NumericMatrix& nm,
+    Rcpp::IntegerVector& geometry_cols,
+    Rcpp::NumericVector& line_ids
   ) {
+    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids );
+    return sfc_linestring( nm, geometry_cols, line_positions );
+  }
+
+  inline SEXP sfc_linestring(
+    Rcpp::DataFrame& df,
+    Rcpp::StringVector& geometry_cols,
+    Rcpp::IntegerMatrix& line_positions
+  ) {
+    R_xlen_t n_lines = line_positions.nrow();
+    Rcpp::List sfc( n_lines );
+
     Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
     Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
     Rcpp::NumericVector m_range = sfheaders::zm::start_m_range();
@@ -542,14 +554,6 @@ namespace sfc {
 
     R_xlen_t n_col = df.ncol();
     sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, df, geometry_cols );
-
-    SEXP unique_ids = sfheaders::utils::get_sexp_unique( line_ids );
-
-    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids, unique_ids );
-
-    R_xlen_t n_lines = sfheaders::utils::get_sexp_length( unique_ids );
-
-    Rcpp::List sfc( n_lines );
 
     int start;
     int end;
@@ -571,12 +575,23 @@ namespace sfc {
     return sfc;
   }
 
-
   inline SEXP sfc_linestring(
       Rcpp::DataFrame& df,
-      Rcpp::IntegerVector& geometry_cols,
+      Rcpp::StringVector& geometry_cols,
       SEXP& line_ids
   ) {
+    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids );
+    return sfc_linestring( df, geometry_cols, line_positions );
+  }
+
+  inline SEXP sfc_linestring(
+    Rcpp::DataFrame& df,
+    Rcpp::IntegerVector& geometry_cols,
+    Rcpp::IntegerMatrix& line_positions
+  ) {
+    R_xlen_t n_lines = line_positions.nrow();
+    Rcpp::List sfc( n_lines );
+
     Rcpp::NumericVector bbox = sfheaders::bbox::start_bbox();
     Rcpp::NumericVector z_range = sfheaders::zm::start_z_range();
     Rcpp::NumericVector m_range = sfheaders::zm::start_m_range();
@@ -585,13 +600,6 @@ namespace sfc {
 
     R_xlen_t n_col = df.ncol();
     sfheaders::zm::calculate_zm_ranges( n_col, z_range, m_range, df, geometry_cols );
-
-    SEXP unique_ids = sfheaders::utils::get_sexp_unique( line_ids );
-    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids, unique_ids );
-
-    R_xlen_t n_lines = sfheaders::utils::get_sexp_length( unique_ids );
-
-    Rcpp::List sfc( n_lines );
 
     int start;
     int end;
@@ -612,6 +620,16 @@ namespace sfc {
 
     sfheaders::sfc::make_sfc( sfc, sfheaders::sfc::SFC_LINESTRING, bbox, z_range, m_range );
     return sfc;
+  }
+
+
+  inline SEXP sfc_linestring(
+      Rcpp::DataFrame& df,
+      Rcpp::IntegerVector& geometry_cols,
+      SEXP& line_ids
+  ) {
+    Rcpp::IntegerMatrix line_positions = sfheaders::utils::id_positions( line_ids );
+    return sfc_linestring( df, geometry_cols, line_positions );
   }
 
   inline SEXP sfc_linestring(
@@ -727,8 +745,8 @@ namespace sfc {
     case INTSXP: {
     if( Rf_isMatrix( x ) ) {  // #nocov
       SEXP xc = Rcpp::clone( x ); // #nocov
-      Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( xc );  // #nocov
-      return sfc_linestring( im, geometry_cols, linestring_id );      // #nocov
+      Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( xc );
+      return sfc_linestring( im, geometry_cols, linestring_id );
     // } else {
     //   Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( x );
     //   return sfc_linestring( iv, geometry_cols, linestring_id );
@@ -796,7 +814,6 @@ namespace sfc {
         Rcpp::IntegerVector iv_linestring_id_col = Rcpp::as< Rcpp::IntegerVector >( linestring_id );
         int i_linestring_id_col = iv_linestring_id_col[0];
         return sfc_linestring( x, iv_geometry_cols, i_linestring_id_col );
-
       }
       case STRSXP: {
         Rcpp::StringVector sv_geometry_cols = Rcpp::as< Rcpp::StringVector >( geometry_cols );

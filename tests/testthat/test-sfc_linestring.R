@@ -148,7 +148,7 @@ test_that("various objects converted to sfc_LINESTRING",{
   m <- cbind(c(1L,1L), m)
   df <- as.data.frame( m )
   m <- as.matrix( df )
-  res <- sfheaders:::rcpp_sfc_linestring(df, c("V1","V2"), "V3")
+  res <- sfheaders:::rcpp_sfc_linestring(m, c("V1","V2"), "V3")
   expect_equal( attr( res, "class" ), c("sfc_LINESTRING", "sfc") )
   expect_true( is_linestring( res ) )
 
@@ -238,3 +238,17 @@ test_that("vectorised version works",{
 
 })
 
+test_that("issue 38 is fixed", {
+
+  df <- data.frame(
+    x = 1:10
+    , y = 1:10
+    , z = 1:10
+    # , m = 1:10
+    , id = c(1,1,1,1,1,2,2,2,2,2)
+  )
+
+  sfc <- sfheaders::sfc_linestring(df, linestring_id = "id")
+  expect_true( all( unclass( attr( sfc, "z_range" ) ) == c(1, 10) ) )
+  expect_true( all( is.na( unclass( attr( sfc, "m_range" ) ) ) ) )
+})

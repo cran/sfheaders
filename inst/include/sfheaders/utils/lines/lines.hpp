@@ -2,6 +2,7 @@
 #define R_SFHEADERS_UTILS_LINES_H
 
 #include <Rcpp.h>
+#include "sfheaders/utils/unique/unique_sort.hpp"
 
 namespace sfheaders {
 namespace utils {
@@ -21,13 +22,17 @@ namespace utils {
     R_xlen_t unique_n = unique_ids.length();
 
     Rcpp::IntegerMatrix im( unique_n, 2 );
+    // 3 columns:
+    // 1 - start position
+    // 2 - end position
+    // 3 - id value
 
-    // if n = 1, there's only 1 unique ID
-    if( n == 1 ) {
-      im( 0, 0 ) = 0;
-      im( 0, 1 ) = n - 1;
-      return im;
-    }
+    // // if n = 1, there's only 1 unique ID
+    // if( n == 1 ) {
+    //   im( 0, 0 ) = 0;
+    //   im( 0, 1 ) = n - 1;
+    //   return im;
+    // }
 
     R_xlen_t i;
 
@@ -79,12 +84,12 @@ namespace utils {
     Rcpp::IntegerMatrix im( unique_n, 2);
 
 
-    // if n = 1, there's only 1 unique ID
-    if( n == 1 ) {
-      im( 0, 0 ) = 0;
-      im( 0, 1 ) = n - 1;
-      return im;
-    }
+    // // if n = 1, there's only 1 unique ID
+    // if( n == 1 ) {
+    //   im( 0, 0 ) = 0;
+    //   im( 0, 1 ) = n - 1;
+    //   return im;
+    // }
 
     R_xlen_t i;
 
@@ -139,12 +144,12 @@ namespace utils {
 
     Rcpp::IntegerMatrix im( unique_n, 2);
 
-    // if n = 1, there's only 1 unique ID
-    if( n == 1 ) {
-      im( 0, 0 ) = 0;
-      im( 0, 1 ) = n - 1;
-      return im;
-    }
+    // // if n = 1, there's only 1 unique ID
+    // if( n == 1 ) {
+    //   im( 0, 0 ) = 0;
+    //   im( 0, 1 ) = n - 1;
+    //   return im;
+    // }
 
     R_xlen_t i;
 
@@ -222,6 +227,33 @@ namespace utils {
     return Rcpp::IntegerMatrix(0);
   }
 
+  inline Rcpp::IntegerMatrix id_positions(
+    Rcpp::StringVector& line_ids
+  ) {
+    Rcpp::StringVector unique_ids = sfheaders::utils::get_sexp_unique( line_ids );
+    return id_positions( line_ids, unique_ids );
+  }
+
+  inline Rcpp::IntegerMatrix id_positions(
+    Rcpp::IntegerVector& line_ids
+  ) {
+    Rcpp::IntegerVector unique_ids = sfheaders::utils::get_sexp_unique( line_ids );
+    return id_positions( line_ids, unique_ids );
+  }
+
+  inline Rcpp::IntegerMatrix id_positions(
+    Rcpp::NumericVector& line_ids
+  ) {
+    Rcpp::NumericVector unique_ids = sfheaders::utils::get_sexp_unique( line_ids );
+    return id_positions( line_ids, unique_ids );
+  }
+
+  inline Rcpp::IntegerMatrix id_positions(
+    SEXP& line_ids
+  ) {
+    SEXP unique_ids = sfheaders::utils::get_sexp_unique( line_ids );
+    return id_positions( line_ids, unique_ids );
+  }
 
 } // utils
 } // sfheaders

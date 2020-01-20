@@ -9,38 +9,61 @@
 namespace sfheaders {
 namespace utils {
 
-  // if the line_id cols are supplied, but the geometry_cols are not
-  // we need to know the rest of the columns so we can supply them
+
   inline SEXP other_columns(
-      Rcpp::IntegerVector& other_cols,
+      Rcpp::IntegerVector& all_cols,
       Rcpp::IntegerVector& id_cols
   ) {
 
-    // Can't use SETDIFF because I need the order maintained
-    // Rcpp::IntegerVector iv = Rcpp::setdiff( other_cols, id_cols );
-    // return iv;
+    int n_id_cols = id_cols.size();
+    int n_other_cols = all_cols.size();
+    int i, j;
+    bool is_in = false;
 
-    int n_id_cols = id_cols.length();
-    int i;
-    for( i = (n_id_cols - 1); i >= 0; i-- ) {
-      int to_remove = id_cols[ i ];
-      other_cols.erase( to_remove );
+    for( i = 0; i < n_id_cols; i++ ) {
+      is_in = false;
+      int id_col = id_cols[i];
+      for( j = 0; j < n_other_cols; j++ ) {
+        int a_col = all_cols[j];
+        if( id_col == a_col ) {
+          // this column is one of the id ones, so we shouldn't keep it.
+          is_in = true;
+          break;
+        }
+      }
+      if( is_in ) {
+        all_cols.erase( j );
+      }
     }
-    return other_cols;
+    return all_cols;
   }
 
   inline SEXP other_columns(
-      Rcpp::NumericVector& other_cols,
+      Rcpp::NumericVector& all_cols,
       Rcpp::NumericVector& id_cols
   ) {
 
-    int n_id_cols = id_cols.length();
-    int i;
-    for( i = (n_id_cols - 1); i >= 0; i-- ) {
-      int to_remove = id_cols[ i ];
-      other_cols.erase( to_remove );
+    int n_id_cols = id_cols.size();
+    int n_other_cols = all_cols.size();
+    int i, j;
+    bool is_in = false;
+
+    for( i = 0; i < n_id_cols; i++ ) {
+      is_in = false;
+      double id_col = id_cols[i];
+      for( j = 0; j < n_other_cols; j++ ) {
+        double a_col = all_cols[j];
+        if( id_col == a_col ) {
+          // this column is one of the id ones, so we shouldn't keep it.
+          is_in = true;
+          break;
+        }
+      }
+      if( is_in ) {
+        all_cols.erase( j );
+      }
     }
-    return other_cols;
+    return all_cols;
   }
 
 
@@ -49,13 +72,11 @@ namespace utils {
       Rcpp::StringVector& id_cols
   ) {
 
-    // Rcpp::StringVector sv = Rcpp::setdiff( all_cols, id_cols );
-    // return sv;
     int n_id_cols = id_cols.size();
     int n_other_cols = all_cols.size();
     int i, j;
     bool is_in = false;
-    Rcpp::IntegerVector id_col_index( n_id_cols );
+
     for( i = 0; i < n_id_cols; i++ ) {
       is_in = false;
       Rcpp::String id_col = id_cols[i];
@@ -72,7 +93,6 @@ namespace utils {
       }
     }
     return all_cols;
-    //return other_cols;
   }
 
   inline SEXP other_columns(
@@ -343,48 +363,48 @@ namespace utils {
 
   }
 
-    inline SEXP other_columns(
-        SEXP& x,
-        SEXP& col_1,
-        SEXP& col_2,
-        SEXP& col_3
-    ) {
+  inline SEXP other_columns(
+      SEXP& x,
+      SEXP& col_1,
+      SEXP& col_2,
+      SEXP& col_3
+  ) {
 
-      if( !Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
-        return other_columns( x, col_1 );
-      }
-
-      if( Rf_isNull( col_1 ) && !Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
-        return other_columns( x, col_2 );
-      }
-
-      if( Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && !Rf_isNull( col_3 ) ) {
-        return other_columns( x, col_3 );
-      }
-
-      if( Rf_isNull( col_1) && !Rf_isNull( col_2 ) && !Rf_isNull( col_3 ) ) {
-        return other_columns( x, col_2, col_3 );
-      }
-
-      if ( !Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && !Rf_isNull( col_3 ) ) {
-        return other_columns( x, col_1, col_3 );
-      }
-
-      if ( !Rf_isNull( col_1 ) && !Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
-        return other_columns( x, col_1, col_2 );
-      }
-
-      if ( Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
-        // then it's just all teh columns
-        return other_columns( x );
-      }
-
-      // combine cols 1, 2 and 3
-      SEXP other_cols_1 = sfheaders::utils::concatenate_vectors( col_1, col_2 );
-      SEXP other_cols = sfheaders::utils::concatenate_vectors( other_cols_1, col_3 );
-      return other_columns( x, other_cols );
-
+    if( !Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
+      return other_columns( x, col_1 );
     }
+
+    if( Rf_isNull( col_1 ) && !Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
+      return other_columns( x, col_2 );
+    }
+
+    if( Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && !Rf_isNull( col_3 ) ) {
+      return other_columns( x, col_3 );
+    }
+
+    if( Rf_isNull( col_1) && !Rf_isNull( col_2 ) && !Rf_isNull( col_3 ) ) {
+      return other_columns( x, col_2, col_3 );
+    }
+
+    if ( !Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && !Rf_isNull( col_3 ) ) {
+      return other_columns( x, col_1, col_3 );
+    }
+
+    if ( !Rf_isNull( col_1 ) && !Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
+      return other_columns( x, col_1, col_2 );
+    }
+
+    if ( Rf_isNull( col_1 ) && Rf_isNull( col_2 ) && Rf_isNull( col_3 ) ) {
+      // then it's just all teh columns
+      return other_columns( x );
+    }
+
+    // combine cols 1, 2 and 3
+    SEXP other_cols_1 = sfheaders::utils::concatenate_vectors( col_1, col_2 );
+    SEXP other_cols = sfheaders::utils::concatenate_vectors( other_cols_1, col_3 );
+    return other_columns( x, other_cols );
+
+  }
 
   // #nocov start
 

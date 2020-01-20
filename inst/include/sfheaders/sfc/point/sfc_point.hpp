@@ -46,7 +46,6 @@ namespace sfc {
 
     for( i = 0; i < n_row; i++ ) {
       Rcpp::IntegerVector this_point = im( i, Rcpp::_ );
-
       if( sfheaders::utils::is_null_geometry( this_point, "POINT" ) ) {
         n_empty++;
       }
@@ -130,9 +129,9 @@ namespace sfc {
     for( i = 0; i < n_row; i++ ) {
       Rcpp::IntegerVector this_point = im( i, Rcpp::_ );
       if( sfheaders::utils::is_null_geometry( this_point, "POINT" ) ) {
-        n_empty++;
+        n_empty++;  // #nocov
       }
-      sfc[i] = sfheaders::sfg::sfg_point( this_point );
+      sfc[i] = sfheaders::sfg::sfg_point( this_point, cols );
     }
 
     sfheaders::sfc::make_sfc( sfc, sfheaders::sfc::SFC_POINT, bbox, z_range, m_range, n_empty );
@@ -191,7 +190,7 @@ namespace sfc {
       if( sfheaders::utils::is_null_geometry( this_point, "POINT" ) ) {
         n_empty++;
       }
-      sfc[i] = sfheaders::sfg::sfg_point( this_point );
+      sfc[i] = sfheaders::sfg::sfg_point( this_point, cols );
     }
 
     sfheaders::sfc::make_sfc( sfc, sfheaders::sfc::SFC_POINT, bbox, z_range, m_range, n_empty );

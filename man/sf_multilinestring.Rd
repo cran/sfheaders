@@ -5,7 +5,8 @@
 \title{sf MULTILINESTRING}
 \usage{
 sf_multilinestring(obj = NULL, x = NULL, y = NULL, z = NULL,
-  m = NULL, multilinestring_id = NULL, linestring_id = NULL)
+  m = NULL, multilinestring_id = NULL, linestring_id = NULL,
+  keep = FALSE)
 }
 \arguments{
 \item{obj}{sorted matrix or data.frame}
@@ -21,6 +22,10 @@ sf_multilinestring(obj = NULL, x = NULL, y = NULL, z = NULL,
 \item{multilinestring_id}{column of ids for multilinestrings}
 
 \item{linestring_id}{column of ids for linestrings (within multilinestrings)}
+
+\item{keep}{logical indicating if the non-geometry and non-id columns should be kept.
+if TRUE you must supply the geometry and id columns, and only the first row of
+each geometry is kept. See Keeping Properties.}
 }
 \value{
 \code{sf} object of MULTILINESTRING geometries
@@ -34,6 +39,16 @@ sfheaders functions do not perform any validity checks on the geometries.
 Nor do they set Coordinate Reference Systems, EPSG, PROJ4 or precision attributes.
 
 The data.frame and matrices you send into the sfheader functions must be ordered.
+}
+
+\section{Keeping Properties}{
+
+
+Setting \code{keep = TRUE} will retain the first row of any columns not specified as a
+coordinate (x, y, z, m) or an id (e.g., linestring_id, polygon_id) of the input \code{obj}.
+
+The \code{sf_*} functions assume the input \code{obj} is a long data.frame / matrix,
+where any properties are repeated down the table for the same geometry.
 }
 
 \examples{
@@ -65,9 +80,9 @@ sf_multilinestring( obj = df, x = "x", y = "y")
 sf_multilinestring( obj = df, x = "x", y = "y", z = "z")
 sf_multilinestring( obj = df, x = "x", y = "y", z = "z", m = "m")
 
-sf_multilinestring( obj = df, x = 2, y = 3)
-sf_multilinestring( obj = df, x = 2, y = 3, z = 4)
-sf_multilinestring( obj = df, x = 2, y = 3, z = 4, m = 5)
+sf_multilinestring( obj = df, x = 3, y = 4)
+sf_multilinestring( obj = df, x = 3, y = 4, z = 5)
+sf_multilinestring( obj = df, x = 3, y = 4, z = 5, m = 6 )
 
 sf_multilinestring( obj = df, multilinestring_id = "ml_id", linestring_id = "l_id" )
 sf_multilinestring( obj = df, multilinestring_id = 1, linestring_id = 2 )
