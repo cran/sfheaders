@@ -39,6 +39,56 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_count_new_objects
+Rcpp::NumericVector rcpp_count_new_objects(SEXP sfg, std::string cast_to);
+RcppExport SEXP _sfheaders_rcpp_count_new_objects(SEXP sfgSEXP, SEXP cast_toSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type sfg(sfgSEXP);
+    Rcpp::traits::input_parameter< std::string >::type cast_to(cast_toSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_count_new_objects(sfg, cast_to));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_count_new_sfc_objects
+Rcpp::NumericVector rcpp_count_new_sfc_objects(Rcpp::List sfc, std::string cast_to);
+RcppExport SEXP _sfheaders_rcpp_count_new_sfc_objects(SEXP sfcSEXP, SEXP cast_toSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type sfc(sfcSEXP);
+    Rcpp::traits::input_parameter< std::string >::type cast_to(cast_toSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_count_new_sfc_objects(sfc, cast_to));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_cast_sfc
+Rcpp::List rcpp_cast_sfc(Rcpp::List sfc, std::string cast_to, bool close);
+RcppExport SEXP _sfheaders_rcpp_cast_sfc(SEXP sfcSEXP, SEXP cast_toSEXP, SEXP closeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type sfc(sfcSEXP);
+    Rcpp::traits::input_parameter< std::string >::type cast_to(cast_toSEXP);
+    Rcpp::traits::input_parameter< bool >::type close(closeSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_cast_sfc(sfc, cast_to, close));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_cast_sf
+Rcpp::DataFrame rcpp_cast_sf(Rcpp::DataFrame sf, std::string cast_to, bool close);
+RcppExport SEXP _sfheaders_rcpp_cast_sf(SEXP sfSEXP, SEXP cast_toSEXP, SEXP closeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type sf(sfSEXP);
+    Rcpp::traits::input_parameter< std::string >::type cast_to(cast_toSEXP);
+    Rcpp::traits::input_parameter< bool >::type close(closeSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_cast_sf(sf, cast_to, close));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_sfg_dimension
 std::string rcpp_sfg_dimension(SEXP x);
 RcppExport SEXP _sfheaders_rcpp_sfg_dimension(SEXP xSEXP) {
@@ -361,6 +411,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_sfc_remove_holes
+Rcpp::List rcpp_sfc_remove_holes(Rcpp::List sfc, bool close);
+RcppExport SEXP _sfheaders_rcpp_sfc_remove_holes(SEXP sfcSEXP, SEXP closeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type sfc(sfcSEXP);
+    Rcpp::traits::input_parameter< bool >::type close(closeSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_sfc_remove_holes(sfc, close));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_get_sfc_attributes
+Rcpp::List rcpp_get_sfc_attributes(Rcpp::List sfc);
+RcppExport SEXP _sfheaders_rcpp_get_sfc_attributes(SEXP sfcSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type sfc(sfcSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_get_sfc_attributes(sfc));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_get_sfg_type
 std::string rcpp_get_sfg_type(int sfg_type);
 RcppExport SEXP _sfheaders_rcpp_get_sfg_type(SEXP sfg_typeSEXP) {
@@ -518,6 +591,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_sfg_remove_holes
+SEXP rcpp_sfg_remove_holes(SEXP sfg, bool close);
+RcppExport SEXP _sfheaders_rcpp_sfg_remove_holes(SEXP sfgSEXP, SEXP closeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type sfg(sfgSEXP);
+    Rcpp::traits::input_parameter< bool >::type close(closeSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_sfg_remove_holes(sfg, close));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_other_columns
 SEXP rcpp_other_columns(SEXP x, SEXP id_cols, SEXP id_col2, SEXP id_col3);
 RcppExport SEXP _sfheaders_rcpp_other_columns(SEXP xSEXP, SEXP id_colsSEXP, SEXP id_col2SEXP, SEXP id_col3SEXP) {
@@ -611,6 +696,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sfheaders_rcpp_calculate_bbox", (DL_FUNC) &_sfheaders_rcpp_calculate_bbox, 2},
     {"_sfheaders_rcpp_calculate_z_range", (DL_FUNC) &_sfheaders_rcpp_calculate_z_range, 1},
     {"_sfheaders_rcpp_calculate_m_range", (DL_FUNC) &_sfheaders_rcpp_calculate_m_range, 1},
+    {"_sfheaders_rcpp_count_new_objects", (DL_FUNC) &_sfheaders_rcpp_count_new_objects, 2},
+    {"_sfheaders_rcpp_count_new_sfc_objects", (DL_FUNC) &_sfheaders_rcpp_count_new_sfc_objects, 2},
+    {"_sfheaders_rcpp_cast_sfc", (DL_FUNC) &_sfheaders_rcpp_cast_sfc, 3},
+    {"_sfheaders_rcpp_cast_sf", (DL_FUNC) &_sfheaders_rcpp_cast_sf, 3},
     {"_sfheaders_rcpp_sfg_dimension", (DL_FUNC) &_sfheaders_rcpp_sfg_dimension, 1},
     {"_sfheaders_rcpp_get_vec", (DL_FUNC) &_sfheaders_rcpp_get_vec, 2},
     {"_sfheaders_rcpp_get_mat", (DL_FUNC) &_sfheaders_rcpp_get_mat, 2},
@@ -636,6 +725,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sfheaders_rcpp_sfc_polygons", (DL_FUNC) &_sfheaders_rcpp_sfc_polygons, 2},
     {"_sfheaders_rcpp_sfc_multipolygon", (DL_FUNC) &_sfheaders_rcpp_sfc_multipolygon, 6},
     {"_sfheaders_rcpp_sfc_multipolygons", (DL_FUNC) &_sfheaders_rcpp_sfc_multipolygons, 2},
+    {"_sfheaders_rcpp_sfc_remove_holes", (DL_FUNC) &_sfheaders_rcpp_sfc_remove_holes, 2},
+    {"_sfheaders_rcpp_get_sfc_attributes", (DL_FUNC) &_sfheaders_rcpp_get_sfc_attributes, 1},
     {"_sfheaders_rcpp_get_sfg_type", (DL_FUNC) &_sfheaders_rcpp_get_sfg_type, 1},
     {"_sfheaders_rcpp_sfg_point", (DL_FUNC) &_sfheaders_rcpp_sfg_point, 2},
     {"_sfheaders_rcpp_sfg_points", (DL_FUNC) &_sfheaders_rcpp_sfg_points, 1},
@@ -649,6 +740,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sfheaders_rcpp_sfg_polygons", (DL_FUNC) &_sfheaders_rcpp_sfg_polygons, 2},
     {"_sfheaders_rcpp_sfg_multipolygon", (DL_FUNC) &_sfheaders_rcpp_sfg_multipolygon, 5},
     {"_sfheaders_rcpp_sfg_multipolygons", (DL_FUNC) &_sfheaders_rcpp_sfg_multipolygons, 2},
+    {"_sfheaders_rcpp_sfg_remove_holes", (DL_FUNC) &_sfheaders_rcpp_sfg_remove_holes, 2},
     {"_sfheaders_rcpp_other_columns", (DL_FUNC) &_sfheaders_rcpp_other_columns, 4},
     {"_sfheaders_rcpp_id_positions", (DL_FUNC) &_sfheaders_rcpp_id_positions, 2},
     {"_sfheaders_rcpp_subset_dataframe", (DL_FUNC) &_sfheaders_rcpp_subset_dataframe, 4},
