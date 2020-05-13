@@ -1,5 +1,6 @@
-[![Travis build
-status](https://travis-ci.com/dcooley/sfheaders.svg?branch=master)](https://travis-ci.com/dcooley/sfheaders)
+
+[![R build
+status](https://github.com/dcooley/sfheaders/workflows/R-CMD-check/badge.svg)](https://github.com/dcooley/sfheaders/actions)
 [![Coverage
 status](https://codecov.io/gh/dcooley/sfheaders/branch/master/graph/badge.svg)](https://codecov.io/github/dcooley/sfheaders?branch=master)
 ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/sfheaders)
@@ -22,7 +23,7 @@ they are.
 
 ## Does it really make `sf` objects?
 
-Yes and No. 
+Yes and No.
 
 These functions do not perform any validity checks on the geometries.
 Nor do they set Coordinate Reference Systems, EPSG, PROJ4 or precision

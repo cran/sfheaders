@@ -358,6 +358,8 @@ namespace cast {
     int casting_to = cast_type( cast_to );
 
     Rcpp::List crs = sfc.attr("crs");
+    sfheaders::sfc::update_crs( crs );
+
     double precision = sfc.attr("precision");
     Rcpp::NumericVector bbox = sfc.attr("bbox");
 
@@ -366,25 +368,22 @@ namespace cast {
 
     if( sfc.hasAttribute("z_range") ) {
       z_range = sfc.attr("z_range");
+    }
+
+    if( sfc.hasAttribute("m_range") ) {
       m_range = sfc.attr("m_range");
     }
 
     int n_empty = sfc.attr("n_empty");
     std::unordered_set< std::string > geometry_types{ cast_to };
 
-    int epsg = crs[0];
-    Rcpp::String proj4string = crs[1];
-
     std::string cast_from;
+    std::string xyzm;
 
     R_xlen_t i, j;
 
-    // Rcpp::Rcout << "n_results: " << n_results << std::endl;
-
     R_xlen_t total_results = Rcpp::sum( n_results );
     Rcpp::List res( total_results );
-
-    //return res;
 
     // loop over reach sfg and convert and fill teh resutl list
     R_xlen_t result_counter = 0;  // for indexing into the res( ) list
@@ -403,10 +402,11 @@ namespace cast {
 
       Rcpp::CharacterVector cls = sfheaders::utils::getSfgClass( sfg );
       cast_from = cls[1];
+      xyzm = cls[0];
 
       int casting_from = cast_type( cast_from );
 
-      SEXP new_res = sfheaders::cast::cast_to( sfg, cast_from, cast_to, close );
+      SEXP new_res = sfheaders::cast::cast_to( sfg, cast_from, cast_to, xyzm, close );
 
       if( casting_from <= casting_to ) {
         res[ result_counter ] = new_res;
@@ -421,7 +421,7 @@ namespace cast {
 
     }
     sfheaders::sfc::attach_sfc_attributes(
-      res, cast_to, geometry_types, bbox, z_range, m_range, epsg, proj4string, n_empty, precision
+      res, cast_to, geometry_types, bbox, z_range, m_range, crs, n_empty, precision
       );
     return res;
   }
@@ -431,6 +431,7 @@ namespace cast {
       std::string& cast_to,
       bool close = true
   ) {
+
     Rcpp::NumericVector n_results = count_new_sfc_objects( sfc, cast_to );
     return cast_sfc( sfc, n_results, cast_to, close );
   }

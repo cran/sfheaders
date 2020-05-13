@@ -15,9 +15,10 @@ namespace sf {
       SEXP& x,
       SEXP& geometry_cols,
       SEXP& multilinestring_id,
-      SEXP& linestring_id
+      SEXP& linestring_id,
+      std::string xyzm
   ) {
-    Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( x, geometry_cols, multilinestring_id, linestring_id );
+    Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( x, geometry_cols, multilinestring_id, linestring_id, xyzm );
 
     SEXP ids = sfheaders::utils::get_ids( x, multilinestring_id );
     Rcpp::DataFrame sf = sfheaders::sf::make_sf( sfc, ids );
@@ -30,16 +31,27 @@ namespace sf {
       Rcpp::StringVector& property_cols,
       Rcpp::String& id_column,
       SEXP& multiline_ids,
-      Rcpp::String& line_ids
+      Rcpp::String& line_ids,
+      std::string xyzm
   ) {
     Rcpp::IntegerMatrix multilinestring_positions = sfheaders::utils::id_positions( multiline_ids );
     Rcpp::IntegerVector row_idx = multilinestring_positions( Rcpp::_, 0 );
     Rcpp::StringVector df_names = df.names();
     Rcpp::IntegerVector property_idx = sfheaders::utils::where_is( property_cols, df_names );
 
-    Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( df, geometry_cols, line_ids, multilinestring_positions );
+    Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( df, geometry_cols, line_ids, multilinestring_positions, xyzm );
 
-    return sfheaders::sf::create_sf( df, sfc, id_column, property_cols, property_idx, row_idx );
+    Rcpp::List res = Rcpp::List::create(
+      Rcpp::_["df"] = df,
+      Rcpp::_["sfc"] = sfc,
+      Rcpp::_["id_column"] = id_column,
+      Rcpp::_["property_cols"] = property_cols,
+      Rcpp::_["property_idx"] = property_idx,
+      Rcpp::_["row_idx"] = row_idx,
+      Rcpp::_["line_positions"] = multilinestring_positions
+    );
+
+    return res;
   }
 
   inline SEXP sf_multilinestring(
@@ -48,7 +60,8 @@ namespace sf {
       Rcpp::IntegerVector& property_cols,
       int& id_column,
       SEXP& multiline_ids,
-      int& linestring_id
+      int& linestring_id,
+      std::string xyzm
   ) {
 
     // get the property cols as a string_vector so we get the column names
@@ -58,7 +71,7 @@ namespace sf {
     Rcpp::String str_id_column = df_names[ id_column ];
     Rcpp::String str_linestring_id = df_names[ linestring_id ];
 
-    return sf_multilinestring( df, str_geometry_cols, str_property_cols, str_id_column, multiline_ids, str_linestring_id );
+    return sf_multilinestring( df, str_geometry_cols, str_property_cols, str_id_column, multiline_ids, str_linestring_id, xyzm );
   }
 
   inline SEXP sf_multilinestring(
@@ -66,12 +79,13 @@ namespace sf {
       Rcpp::StringVector& geometry_cols,
       Rcpp::StringVector& property_cols,
       Rcpp::String& multilinestring_id,
-      Rcpp::String& linestring_id
+      Rcpp::String& linestring_id,
+      std::string xyzm
   ) {
 
     Rcpp::StringVector df_names = df.names();
     SEXP multiline_ids = df[ multilinestring_id ];
-    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, multiline_ids, linestring_id );
+    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, multiline_ids, linestring_id, xyzm );
   }
 
   inline SEXP sf_multilinestring(
@@ -79,7 +93,8 @@ namespace sf {
       Rcpp::IntegerVector& geometry_cols,
       Rcpp::IntegerVector& property_cols,
       int& multilinestring_id,
-      int& linestring_id
+      int& linestring_id,
+      std::string xyzm
   ) {
 
     Rcpp::StringVector df_names = df.names();
@@ -87,7 +102,7 @@ namespace sf {
     Rcpp::StringVector str_property_cols = df_names[ property_cols ];
     Rcpp::String multiline_id = df_names[ multilinestring_id ];
     Rcpp::String line_id = df_names[ linestring_id ];
-    return sf_multilinestring( df, str_geometry_cols, str_property_cols, multiline_id, line_id );
+    return sf_multilinestring( df, str_geometry_cols, str_property_cols, multiline_id, line_id, xyzm );
   }
 
   inline SEXP sf_multilinestring(
@@ -95,12 +110,13 @@ namespace sf {
       Rcpp::IntegerVector& geometry_cols,
       Rcpp::IntegerVector& property_cols,
       int& multilinestring_id,
-      int& linestring_id
+      int& linestring_id,
+      std::string xyzm
   ) {
 
     sfheaders::utils::column_exists( im, multilinestring_id );
     Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( im );
-    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id );
+    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
   }
 
   inline SEXP sf_multilinestring(
@@ -108,10 +124,11 @@ namespace sf {
       Rcpp::IntegerVector& geometry_cols,
       Rcpp::IntegerVector& property_cols,
       int& multilinestring_id,
-      int& linestring_id
+      int& linestring_id,
+      std::string xyzm
   ) {
     Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( nm );
-    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id );
+    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
   }
 
   inline SEXP sf_multilinestring(
@@ -119,11 +136,12 @@ namespace sf {
       Rcpp::StringVector& geometry_cols,
       Rcpp::StringVector& property_cols,
       Rcpp::String& multilinestring_id,
-      Rcpp::String& linestring_id
+      Rcpp::String& linestring_id,
+      std::string xyzm
   ) {
     Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( im );
     SEXP multiline_ids = df[ multilinestring_id ];
-    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, multiline_ids, linestring_id );
+    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, multiline_ids, linestring_id, xyzm );
   }
 
 
@@ -132,11 +150,12 @@ namespace sf {
       Rcpp::StringVector& geometry_cols,
       Rcpp::StringVector& property_cols,
       Rcpp::String& multilinestring_id,
-      Rcpp::String& linestring_id
+      Rcpp::String& linestring_id,
+      std::string xyzm
   ) {
     Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( nm );
     SEXP multiline_ids = df[ multilinestring_id ];
-    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, multiline_ids, linestring_id );
+    return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, multiline_ids, linestring_id, xyzm );
   }
 
 
@@ -150,27 +169,28 @@ namespace sf {
       Rcpp::IntegerVector& geometry_cols,
       Rcpp::IntegerVector& property_cols,
       int& multilinestring_id,
-      int& linestring_id
+      int& linestring_id,
+      std::string xyzm
   ) {
     switch( TYPEOF( x ) ) {
     case INTSXP: {
       if( Rf_isMatrix( x ) ) {
       SEXP xc = Rcpp::clone( x );
       Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( xc );
-      return sf_multilinestring( im, geometry_cols, property_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( im, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
     }
     }
     case REALSXP: {
       if( Rf_isMatrix( x ) ) {
       SEXP xc = Rcpp::clone( x );
       Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( xc );
-      return sf_multilinestring( nm, geometry_cols, property_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( nm, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
     }
     }
     case VECSXP: {
       if( Rf_inherits( x, "data.frame" ) ) {
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( x );
-      return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
     }
     }
     default: {
@@ -186,7 +206,8 @@ namespace sf {
       Rcpp::StringVector& geometry_cols,
       Rcpp::StringVector& property_cols,
       Rcpp::String& multilinestring_id,
-      Rcpp::String& linestring_id
+      Rcpp::String& linestring_id,
+      std::string xyzm
   ) {
 
     switch( TYPEOF( x ) ) {
@@ -194,20 +215,20 @@ namespace sf {
       if( Rf_isMatrix( x ) ) {
       SEXP xc = Rcpp::clone( x );
       Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( xc );
-      return sf_multilinestring( im, geometry_cols, property_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( im, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
     }
     }
     case REALSXP: {
       if( Rf_isMatrix( x ) ) {
       SEXP xc = Rcpp::clone( x );
       Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( xc );
-      return sf_multilinestring( nm, geometry_cols, property_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( nm, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
     }
     }
     case VECSXP: {
       if( Rf_inherits( x, "data.frame" ) ) {
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( x );
-      return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( df, geometry_cols, property_cols, multilinestring_id, linestring_id, xyzm );
     }
     }
     default: {
@@ -223,11 +244,12 @@ namespace sf {
       SEXP& geometry_cols,
       SEXP& multilinestring_id,
       SEXP& linestring_id,
-      bool& keep
+      bool& keep,
+      std::string xyzm
   ) {
 
     if( !keep ) {
-      return sf_multilinestring( x, geometry_cols, multilinestring_id, linestring_id );
+      return sf_multilinestring( x, geometry_cols, multilinestring_id, linestring_id, xyzm );
     }
 
     if( Rf_isNull( geometry_cols ) ) {
@@ -236,21 +258,49 @@ namespace sf {
 
     if( !Rf_isNull( multilinestring_id ) && Rf_isNull( linestring_id ) ) {
       SEXP linestring_id2 = multilinestring_id;
-      return sf_multilinestring( x, geometry_cols, multilinestring_id, linestring_id2, keep );
+      return sf_multilinestring( x, geometry_cols, multilinestring_id, linestring_id2, keep, xyzm );
     }
 
     if( Rf_isNull( multilinestring_id ) && !Rf_isNull( linestring_id ) ) {
       // the entire object is a polygon
-      Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( x, geometry_cols, multilinestring_id, linestring_id );
+      Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( x, geometry_cols, multilinestring_id, linestring_id, xyzm );
       SEXP property_columns = sfheaders::utils::other_columns( x, geometry_cols, linestring_id );
-      return sfheaders::sf::create_sf( x, sfc, property_columns );
+
+      Rcpp::IntegerVector property_idx = sfheaders::utils::where_is( property_columns, x );
+      Rcpp::IntegerMatrix line_positions(1,2);
+      line_positions(0,0) = 0;
+      line_positions(0,1) = sfheaders::utils::sexp_n_row( x ) - 1;
+
+      Rcpp::List res = Rcpp::List::create(
+        Rcpp::_["x"] = x,
+        Rcpp::_["sfc"] = sfc,
+        Rcpp::_["property_cols"] = property_columns,
+        Rcpp::_["property_idx"] = property_idx,
+        Rcpp::_["line_positions"] = line_positions
+      );
+
+      return res;
     }
 
     if( Rf_isNull( multilinestring_id ) && Rf_isNull( linestring_id ) ) {
       // the entire object is a polygon
-      Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( x, geometry_cols, multilinestring_id, linestring_id );
+      Rcpp::List sfc = sfheaders::sfc::sfc_multilinestring( x, geometry_cols, multilinestring_id, linestring_id, xyzm );
       SEXP property_columns = sfheaders::utils::other_columns( x, geometry_cols );
-      return sfheaders::sf::create_sf( x, sfc, property_columns );
+
+      Rcpp::IntegerVector property_idx = sfheaders::utils::where_is( property_columns, x );
+      Rcpp::IntegerMatrix line_positions(1,2);
+      line_positions(0,0) = 0;
+      line_positions(0,1) = sfheaders::utils::sexp_n_row( x ) - 1;
+
+      Rcpp::List res = Rcpp::List::create(
+        Rcpp::_["x"] = x,
+        Rcpp::_["sfc"] = sfc,
+        Rcpp::_["property_cols"] = property_columns,
+        Rcpp::_["property_idx"] = property_idx,
+        Rcpp::_["line_positions"] = line_positions
+      );
+
+      return res;
     }
 
 
@@ -272,7 +322,7 @@ namespace sf {
         int i_multilinestring_id_col = iv_multilinestring_id_col[0];
         int i_linestring_id_col = iv_linestring_id_col[0];
 
-        return sf_multilinestring( x, iv_geometry_cols, iv_property_cols, i_multilinestring_id_col, i_linestring_id_col );
+        return sf_multilinestring( x, iv_geometry_cols, iv_property_cols, i_multilinestring_id_col, i_linestring_id_col, xyzm );
 
       }
       case STRSXP: {
@@ -287,7 +337,7 @@ namespace sf {
         Rcpp::String s_multilinestring_id_col = sv_multilinestring_id_col[0];
         Rcpp::String s_linestring_id_col = sv_linestring_id_col[0];
 
-        return sf_multilinestring( x, sv_geometry_cols, sv_property_cols, s_multilinestring_id_col, s_linestring_id_col );
+        return sf_multilinestring( x, sv_geometry_cols, sv_property_cols, s_multilinestring_id_col, s_linestring_id_col, xyzm );
       }
       default: {
         Rcpp::stop("sfheaders - unsupported multilinestring type");  // #nocov
