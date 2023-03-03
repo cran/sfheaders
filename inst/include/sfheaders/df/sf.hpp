@@ -31,7 +31,7 @@ namespace df {
 
     R_xlen_t sfc_cols = sfc_df.length();
 
-    Rcpp::NumericVector expanded_index( total_coordinates );
+    Rcpp::IntegerVector expanded_index( total_coordinates );
 
     R_xlen_t i;
     R_xlen_t j;
@@ -59,7 +59,6 @@ namespace df {
     for( i = 0; i < n_col; ++i ) {
 
       if( sf_names[ i ] != geom_column ) {
-
         res_names[ name_position ] = sf_names[ i ];
         SEXP v = sf[ i ];
         geometries::utils::expand_vector( res, v, expanded_index, name_position );
@@ -78,7 +77,6 @@ namespace df {
 
     for( i = 0; i < sfc_df_names.length(); ++i ) {
       Rcpp::String geom = sfc_df_names[ i ];
-      std::find( geometry_columns.begin(), geometry_columns.end(), geom );
       is_in = geometries::utils::where_is( geom, geometry_columns );
       keep_columns[ i ] = is_in == -1 ? false : true;
     }
