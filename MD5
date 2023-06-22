@@ -1,7 +1,7 @@
-aaeac3a2398fb014ddaee9666b6bc179 *DESCRIPTION
+28b227ccafca15c7b12f2eb2ebbb80ae *DESCRIPTION
 f5756d57eaab2e3d1bfd7c9dc67f8534 *LICENSE
 f696ec6446688accaccb958a93f4a9e2 *NAMESPACE
-2a4490e318469072289aceb194a6ea96 *NEWS.md
+9706463f956fd64ae46246883344d033 *NEWS.md
 187d7c0dad162ec1ef8ba4f99f338aab *R/RcppExports.R
 ec53c24e3bd376bb331f17c9c8ec6124 *R/cast.R
 04037e99bcf0bd7f0713328bdf48910e *R/df.R
@@ -11,7 +11,7 @@ f662ff35855f440abdea4cc42f7f3ed5 *R/sf.R
 b7443b92d8bbe28981fc440ca7156a65 *R/sfg.R
 9ad42c0340be8d31030dd1af1e0996ae *R/sfheaders-package.R
 14dbca69c6faeac33a7eb8fc7b7bcb91 *R/utils.R
-7c4c023f483aa252c7723d3e9a172fc3 *README.md
+88c6dfdabf0e15612ba1a3b8f39f469b *README.md
 177da4d0a44a05d26e8af8b004bb5e1d *inst/include/sfheaders/cast/list_cast.hpp
 5e0e550586573b306cb61d2612b72fea *inst/include/sfheaders/cast/sf_cast.hpp
 f17fc1dd0ea6b952ba4352b2f5e0bf75 *inst/include/sfheaders/cast/sfc_cast.hpp
@@ -98,8 +98,8 @@ f6b170cad51db1417f82cdd19c087d4d *man/sfg_multipolygon.Rd
 6bcb1f4c61d6af97df66e9c474fe8a08 *man/sfg_point.Rd
 ec4b32265137a53fd3c65e6ebc1abaef *man/sfg_polygon.Rd
 41805c3744171da58c4bb17c02d67aee *man/sfg_to_df.Rd
-63dba4b39227c6ff84a2097b198bb567 *src/Makevars
-63dba4b39227c6ff84a2097b198bb567 *src/Makevars.win
+868e32f3ee01b70a58689c372e95440c *src/Makevars
+868e32f3ee01b70a58689c372e95440c *src/Makevars.win
 8d020af429adfffe987d50fdb75cbe58 *src/RcppExports.cpp
 9f563944b00e8b26a1ab8e93b10fe380 *src/bbox.cpp
 c94de3afa6d15c0c0175dd212710be88 *src/cast.cpp
